@@ -25,24 +25,27 @@ class MainIntegrationTest {
 
     private Path arquivoMd;
 
-    // Utilitários para capturar o System.err nativamente
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
     private final PrintStream originalErr = System.err;
 
+    private static final String CONTEUDO_MD = "# Capítulo Teste\n\nEste é um conteúdo de um arquivo Markdown.";
+    private static final String NOME_ARQUIVO_MD = "01-introducao.md";
+
     @BeforeEach
     void setUp() throws Exception {
-        // Redireciona a saída de erro para conseguirmos validar nos testes
         System.setErr(new PrintStream(errContent));
 
-        // Cria o arquivo de teste
-        arquivoMd = diretorioDosMd.resolve("01-introducao.md");
-        Files.writeString(arquivoMd, "# Capítulo Teste\n\nEste é um conteúdo de um arquivo Markdown.");
+        arquivoMd = diretorioDosMd.resolve(NOME_ARQUIVO_MD);
+        Files.writeString(arquivoMd, CONTEUDO_MD);
     }
 
     @AfterEach
     void tearDown() {
-        // Restaura a saída padrão de erro do Java
         System.setErr(originalErr);
+    }
+
+    private int executarCotuba(String... args) {
+        return new Main().executar(args);
     }
 
     @Test
@@ -50,11 +53,7 @@ class MainIntegrationTest {
     void deveGerarPdfComSucesso() throws Exception {
         Path arquivoSaida = diretorioDosMd.resolve("saida.pdf");
 
-        int exitCode = new Main().executar(new String[]{
-                "-d", diretorioDosMd.toString(),
-                "-f", "pdf",
-                "-o", arquivoSaida.toString()
-        });
+        int exitCode = executarCotuba("-d", diretorioDosMd.toString(), "-f", "pdf", "-o", arquivoSaida.toString());
 
         assertThat(exitCode).isEqualTo(0);
         assertThat(arquivoSaida).exists().isRegularFile();
@@ -72,11 +71,7 @@ class MainIntegrationTest {
     void deveGerarEpubComSucesso() throws Exception {
         Path arquivoSaida = diretorioDosMd.resolve("saida.epub");
 
-        int exitCode = new Main().executar(new String[]{
-                "-d", diretorioDosMd.toString(),
-                "-f", "epub",
-                "-o", arquivoSaida.toString()
-        });
+        int exitCode = executarCotuba("-d", diretorioDosMd.toString(), "-f", "epub", "-o", arquivoSaida.toString());
 
         assertThat(exitCode).isEqualTo(0);
         assertThat(arquivoSaida).exists().isRegularFile();
@@ -97,11 +92,7 @@ class MainIntegrationTest {
     void deveFalharEEncerrarQuandoFormatoEhInvalido() {
         Path arquivoSaida = diretorioDosMd.resolve("saida.mobi");
 
-        int exitCode = new Main().executar(new String[]{
-                "-d", diretorioDosMd.toString(),
-                "-f", "mobi",
-                "-o", arquivoSaida.toString()
-        });
+        int exitCode = executarCotuba("-d", diretorioDosMd.toString(), "-f", "mobi", "-o", arquivoSaida.toString());
 
         assertThat(exitCode).isEqualTo(1);
         assertThat(errContent.toString()).contains("Formato do ebook inválido: mobi");
@@ -111,15 +102,10 @@ class MainIntegrationTest {
     @Test
     @DisplayName("Deve retornar status 1 e exibir erro caso diretório não tenha arquivos .md")
     void deveFalharEEncerrarQuandoNaoHaArquivosMd() throws Exception {
-        Files.deleteIfExists(arquivoMd); // Deleta o arquivo para simular diretório vazio
+        Files.deleteIfExists(arquivoMd);
         Path arquivoSaida = diretorioDosMd.resolve("saida.pdf");
 
-        int exitCode = new Main().executar(new String[]{
-                "-d", diretorioDosMd.toString(),
-                "-f", "pdf",
-                "-o", arquivoSaida.toString(),
-                "-v"
-        });
+        int exitCode = executarCotuba("-d", diretorioDosMd.toString(), "-f", "pdf", "-o", arquivoSaida.toString(), "-v");
 
         assertThat(exitCode).isEqualTo(1);
         assertThat(errContent.toString()).contains("Não foram encontrados capítulos");
@@ -128,9 +114,7 @@ class MainIntegrationTest {
     @Test
     @DisplayName("Deve acionar a ajuda do CLI e encerrar em caso de argumento desconhecido")
     void deveAcionarAjudaEEncerrarAoPassarArgumentoInvalido() {
-        int exitCode = new Main().executar(new String[]{
-                "-x"
-        });
+        int exitCode = executarCotuba("-x");
 
         assertThat(exitCode).isEqualTo(1);
         assertThat(errContent.toString()).contains("Unrecognized option: -x");
