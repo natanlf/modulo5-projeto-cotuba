@@ -47,27 +47,7 @@ public class GenerateEpubService implements GenerateBookService {
 
                 arquivosMD.forEach(arquivoMD -> {
                     Parser parser = Parser.builder().build();
-                    Node document = null;
-                    try {
-                        document = parser.parseReader(Files.newBufferedReader(arquivoMD));
-                        document.accept(new AbstractVisitor() {
-                            @Override
-                            public void visit(Heading heading) {
-                                if (heading.getLevel() == 1) {
-                                    // capítulo
-                                    String tituloDoCapitulo = ((Text) heading.getFirstChild()).getLiteral();
-                                    // TODO: usar título do capítulo
-                                } else if (heading.getLevel() == 2) {
-                                    // seção
-                                } else if (heading.getLevel() == 3) {
-                                    // título
-                                }
-                            }
-
-                        });
-                    } catch (Exception ex) {
-                        throw new IllegalStateException("Erro ao fazer parse do arquivo " + arquivoMD, ex);
-                    }
+                    Node document = getDocument(arquivoMD, parser);
 
                     try {
                         HtmlRenderer renderer = HtmlRenderer.builder().build();
@@ -112,4 +92,5 @@ public class GenerateEpubService implements GenerateBookService {
             throw new IllegalStateException("Erro ao gerar EPUB: " + arquivoDeSaida.toAbsolutePath(), ex);
         }
     }
+
 }
