@@ -1,7 +1,7 @@
 package br.com.unipds;
 
-import br.com.unipds.service.OptionsService;
-import br.com.unipds.service.ProcessComandLineService;
+import br.com.unipds.service.options.OptionsService;
+import br.com.unipds.service.commandline.ProcessComandLineService;
 import br.com.unipds.service.file.FileService;
 import org.apache.commons.cli.CommandLine;
 

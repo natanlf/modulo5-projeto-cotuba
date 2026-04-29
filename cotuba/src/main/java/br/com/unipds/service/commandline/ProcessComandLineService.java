@@ -1,4 +1,4 @@
-package br.com.unipds.service;
+package br.com.unipds.service.commandline;
 
 import org.apache.commons.cli.*;
 

@@ -1,5 +1,6 @@
 package br.com.unipds.service.generate;
 
+import br.com.unipds.service.markedown.MarkeDownService;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfOutline;
@@ -39,15 +40,8 @@ public class GeneratePdfService implements GenerateBookService {
             pdf.getDocumentInfo().setAuthor("Autor");
 
             PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*.md");
-            try (Stream<Path> streamMDs = Files.list(diretorioDosMD)) {
-                List<Path> arquivosMD = streamMDs
-                        .filter(matcher::matches)
-                        .sorted()
-                        .toList();
 
-                if (arquivosMD.isEmpty()) {
-                    throw new IllegalStateException("Não foram encontrados capítulos (arquivos .md) no diretório: " + diretorioDosMD.toAbsolutePath());
-                }
+            List<Path> arquivosMD = MarkeDownService.render(diretorioDosMD);
 
                 arquivosMD.forEach(arquivoMD -> {
                     Parser parser = Parser.builder().build();
@@ -83,9 +77,7 @@ public class GeneratePdfService implements GenerateBookService {
                     }
 
                 });
-            } catch (IOException ex) {
-                throw new IllegalStateException("Erro tentando encontrar arquivos .md em " + diretorioDosMD.toAbsolutePath(), ex);
-            }
+
 
         } catch (Exception ex) {
             throw new IllegalStateException("Erro ao gerar PDF: " + arquivoDeSaida.toAbsolutePath(), ex);

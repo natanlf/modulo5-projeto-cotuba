@@ -1,5 +1,6 @@
 package br.com.unipds.service.generate;
 
+import br.com.unipds.service.markedown.MarkeDownService;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.GuideReference;
@@ -34,18 +35,9 @@ public class GenerateEpubService implements GenerateBookService {
 
             boolean[] ehPrimeiroCapitulo = {true};
 
-            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*.md");
-            try (Stream<Path> streamMDs = Files.list(diretorioDosMD)) {
-                List<Path> arquivosMD = streamMDs
-                        .filter(matcher::matches)
-                        .sorted()
-                        .toList();
+            List<Path> arquivosMD = MarkeDownService.render(diretorioDosMD);
 
-                if (arquivosMD.isEmpty()) {
-                    throw new IllegalStateException("Não foram encontrados capítulos (arquivos .md) no diretório: " + diretorioDosMD.toAbsolutePath());
-                }
-
-                arquivosMD.forEach(arquivoMD -> {
+            arquivosMD.forEach(arquivoMD -> {
                     Parser parser = Parser.builder().build();
                     Node document = getDocument(arquivoMD, parser);
 
@@ -76,9 +68,7 @@ public class GenerateEpubService implements GenerateBookService {
                         throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + arquivoMD, ex);
                     }
                 });
-            } catch (IOException ex) {
-                throw new IllegalStateException("Erro tentando encontrar arquivos .md em " + diretorioDosMD.toAbsolutePath(), ex);
-            }
+
 
             var epubWriter = new EpubWriter();
 
