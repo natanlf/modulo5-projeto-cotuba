@@ -1,6 +1,6 @@
 package br.com.unipds.service.generate;
 
-import br.com.unipds.service.markedown.MarkeDownService;
+import br.com.unipds.service.markedown.MarkDownService;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfOutline;
@@ -11,20 +11,15 @@ import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.IElement;
 import com.itextpdf.layout.properties.AreaBreakType;
-import org.commonmark.node.AbstractVisitor;
-import org.commonmark.node.Heading;
 import org.commonmark.node.Node;
-import org.commonmark.node.Text;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
-import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class GeneratePdfService implements GenerateBookService {
 
@@ -41,7 +36,7 @@ public class GeneratePdfService implements GenerateBookService {
 
             PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*.md");
 
-            List<Path> arquivosMD = MarkeDownService.render(diretorioDosMD);
+            List<Path> arquivosMD = MarkDownService.render(diretorioDosMD);
 
                 arquivosMD.forEach(arquivoMD -> {
                     Parser parser = Parser.builder().build();

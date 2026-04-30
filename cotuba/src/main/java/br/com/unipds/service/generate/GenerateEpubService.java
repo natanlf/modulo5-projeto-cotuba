@@ -1,26 +1,20 @@
 package br.com.unipds.service.generate;
 
-import br.com.unipds.service.markedown.MarkeDownService;
+import br.com.unipds.service.markedown.MarkDownService;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.GuideReference;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubWriter;
 import nl.siegmann.epublib.service.MediatypeService;
-import org.commonmark.node.AbstractVisitor;
-import org.commonmark.node.Heading;
 import org.commonmark.node.Node;
-import org.commonmark.node.Text;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class GenerateEpubService implements GenerateBookService {
 
@@ -35,7 +29,7 @@ public class GenerateEpubService implements GenerateBookService {
 
             boolean[] ehPrimeiroCapitulo = {true};
 
-            List<Path> arquivosMD = MarkeDownService.render(diretorioDosMD);
+            List<Path> arquivosMD = MarkDownService.render(diretorioDosMD);
 
             arquivosMD.forEach(arquivoMD -> {
                     Parser parser = Parser.builder().build();
